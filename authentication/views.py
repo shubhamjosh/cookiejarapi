@@ -16,13 +16,22 @@ class SignUp(View):
 
         user = User.objects.create_user(username=user_email_address, first_name=user_first_name, last_name=user_last_name,\
                                         email=user_email_address, password=user_password )
-
         return HttpResponse(user)
 
 class LogIn(View):
-    def get(self, request, username):
+    def post(self, request):
         request_body = json.loads(request.body.decode('utf-8'))
-        # user_username = request.body['username']
-        # user_password = request.body['password']
+        user_username = request_body['username']
+        user_password = request_body['password']
+        user = authenticate(username = user_username, password= user_password)
+        return HttpResponse(user)
 
-        return HttpResponse("OK!")
+class ChangePassword(View):
+    def post(self, request):
+        request_body = json.loads(request.body.decode('utf-8'))
+        user_username = request_body['username']
+        user_new_password = request_body['password']
+        user_object = User.objects.get(username = user_username)
+        user_object.set_password(user_new_password)
+        user_object.save()
+        return HttpResponse("ok!")
